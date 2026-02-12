@@ -5,7 +5,10 @@ TARGET = sgr
 
 SRCS = main.cpp \
        domain/Despesa.cpp \
-       services/ServicoDespesas.cpp
+       domain/Usuario.cpp \
+       domain/Rateio.cpp \
+       services/ServicoDespesas.cpp \
+       services/ServicoRateio.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
