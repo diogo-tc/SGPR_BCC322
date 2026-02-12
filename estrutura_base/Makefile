@@ -1,29 +1,28 @@
-CXX = g++
-CXXFLAGS = -std=c++17 -Wall -Wextra
+.PHONY: all dll bapp app bunit unit bfuncional funcional clean
 
-TARGET = sgr
+all: bapp bunit bfuncional
 
-SRCS = main.cpp \
-       domain/Despesa.cpp \
-       domain/Usuario.cpp \
-       domain/Rateio.cpp \
-       domain/Extrato.cpp \
-       services/ServicoDespesas.cpp \
-       services/ServicoRateio.cpp \
-       services/ServicoExtrato.cpp
+dll:
+	@mkdir -p bin
+	@g++ -shared -fPIC src/lib/domain/*.cpp src/lib/services/*.cpp -o ./bin/libbib.so
 
-OBJS = $(SRCS:.cpp=.o)
+bapp: dll
+	@g++ -I./src/lib ./src/app/*.cpp -L./bin -lbib -o ./bin/app
 
-all: $(TARGET)
+app:
+	@LD_LIBRARY_PATH=./bin ./bin/app
 
-$(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $(OBJS) -o $(TARGET)
+bunit: dll
+	@g++ -I./src/lib tests/unit/*.cpp -L./bin -lbib -o ./bin/unit_teste
 
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+unit:
+	@LD_LIBRARY_PATH=./bin ./bin/unit_teste
 
-run: $(TARGET)
-	./$(TARGET)
+bfuncional: dll
+	@g++ -I./src/lib tests/funcional/*.cpp -L./bin -lbib -o ./bin/func_teste
+
+funcional:
+	@LD_LIBRARY_PATH=./bin ./bin/func_teste
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	@rm -rf ./bin/*
