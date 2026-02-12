@@ -3,7 +3,7 @@
 
 #include <memory>
 #include "../repository/IDespesaRepository.h"
-#include "../../domain/RateioStrategy.h"
+#include "../Interfaces/IRateio.h"
 #include "../../services/ServicoDespesas.h"
 #include "../../services/ServicoRateio.h"
 #include "../../services/ServicoExtrato.h"
@@ -15,7 +15,7 @@ namespace infra {
 namespace factory {
 
 std::unique_ptr<IDespesaRepository> createInMemoryDespesaRepository();
-std::shared_ptr<RateioStrategy> createEqualRateio();
+std::shared_ptr<IRateio> createEqualRateio();
 
 ServicoDespesas createServicoDespesas();
 ServicoRateio createServicoRateio();

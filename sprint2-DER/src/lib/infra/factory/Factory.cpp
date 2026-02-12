@@ -7,7 +7,7 @@ std::unique_ptr<IDespesaRepository> createInMemoryDespesaRepository() {
     return std::make_unique<InMemoryDespesaRepository>();
 }
 
-std::shared_ptr<RateioStrategy> createEqualRateio() {
+std::shared_ptr<IRateio> createEqualRateio() {
     return std::make_shared<EqualRateio>();
 }
 

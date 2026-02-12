@@ -6,8 +6,9 @@
 #include <memory>
 #include "../domain/Despesa.h"
 #include "../infra/repository/IDespesaRepository.h"
+#include "../infra/Interfaces/IDespesa.h"
 
-class ServicoDespesas {
+class ServicoDespesas : public IDespesa {
 private:
     std::unique_ptr<IDespesaRepository> repo;
 
@@ -17,9 +18,9 @@ public:
 
     bool registrarDespesa(const std::string& descricao,
                           double valor,
-                          const std::string& data);
+                          const std::string& data) override;
 
-    const std::vector<Despesa>& listarDespesas() const;
+    const std::vector<Despesa>& listarDespesas() const override;
 };
 
 #endif

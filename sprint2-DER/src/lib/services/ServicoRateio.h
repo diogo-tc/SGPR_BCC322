@@ -6,15 +6,15 @@
 #include "../domain/Despesa.h"
 #include "../domain/Usuario.h"
 #include "../domain/Rateio.h"
-#include "../domain/RateioStrategy.h"
+#include "../infra/Interfaces/IRateio.h"
 
 class ServicoRateio {
 private:
-    std::shared_ptr<RateioStrategy> strategy;
+    std::shared_ptr<IRateio> strategy;
 
 public:
     ServicoRateio();
-    explicit ServicoRateio(std::shared_ptr<RateioStrategy> strat);
+    explicit ServicoRateio(std::shared_ptr<IRateio> strat);
 
     std::vector<Rateio> calcularRateio(
         const std::vector<Despesa>& despesas,

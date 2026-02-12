@@ -5,7 +5,7 @@
 ServicoRateio::ServicoRateio()
     : strategy(infra::factory::createEqualRateio()) {}
 
-ServicoRateio::ServicoRateio(std::shared_ptr<RateioStrategy> strat)
+ServicoRateio::ServicoRateio(std::shared_ptr<IRateio> strat)
     : strategy(std::move(strat)) {}
 
 std::vector<Rateio> ServicoRateio::calcularRateio(

@@ -1,9 +1,9 @@
 #ifndef EQUAL_RATEIO_H
 #define EQUAL_RATEIO_H
 
-#include "RateioStrategy.h"
+#include "../infra/Interfaces/IRateio.h"
 
-class EqualRateio : public RateioStrategy {
+class EqualRateio : public IRateio {
 public:
     std::vector<Rateio> calcular(
         const std::vector<Despesa>& despesas,

@@ -1,14 +1,14 @@
-#ifndef RATEIO_STRATEGY_H
-#define RATEIO_STRATEGY_H
+#ifndef IRATEIO_H
+#define IRATEIO_H
 
 #include <vector>
-#include "Despesa.h"
-#include "Usuario.h"
-#include "Rateio.h"
+#include "../../domain/Despesa.h"
+#include "../../domain/Usuario.h"
+#include "../../domain/Rateio.h"
 
-class RateioStrategy {
+class IRateio {
 public:
-    virtual ~RateioStrategy() = default;
+    virtual ~IRateio() = default;
 
     virtual std::vector<Rateio> calcular(
         const std::vector<Despesa>& despesas,
