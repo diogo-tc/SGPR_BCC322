@@ -7,8 +7,10 @@ SRCS = main.cpp \
        domain/Despesa.cpp \
        domain/Usuario.cpp \
        domain/Rateio.cpp \
+       domain/Extrato.cpp \
        services/ServicoDespesas.cpp \
-       services/ServicoRateio.cpp
+       services/ServicoRateio.cpp \
+       services/ServicoExtrato.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 

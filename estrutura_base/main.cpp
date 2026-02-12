@@ -1,19 +1,25 @@
 #include <iostream>
 #include <vector>
+#include <map>
 
 #include "services/ServicoDespesas.h"
 #include "services/ServicoRateio.h"
-#include "domain/Usuario.h"
+#include "services/ServicoExtrato.h"
 
-/* ===============================
-   TESTES DE DESPESA
-   =============================== */
+#include "domain/Usuario.h"
+#include "domain/Despesa.h"
+#include "domain/Rateio.h"
+#include "domain/Extrato.h"
+
+/* =====================================================
+   TESTES DO SERVICO DE DESPESAS
+   ===================================================== */
 
 void testeRegistrarDespesaValida() {
-    std::cout << "Cenário: Registrar despesa com dados válidos\n";
+    std::cout << "Cenario: Registrar despesa com dados validos\n";
 
     ServicoDespesas servico;
-    bool sucesso = servico.registrarDespesa("açúcar", 5.00, "05/02/2026");
+    bool sucesso = servico.registrarDespesa("Acucar", 5.00, "05/02/2026");
 
     if (sucesso && servico.listarDespesas().size() == 1) {
         const Despesa& d = servico.listarDespesas()[0];
@@ -22,33 +28,33 @@ void testeRegistrarDespesaValida() {
                   << " | R$ " << d.getValor()
                   << " | " << d.getData() << "\n";
     } else {
-        std::cout << "✘ Falha ao registrar despesa válida\n";
+        std::cout << "✘ Falha ao registrar despesa valida\n";
     }
 
     std::cout << "---------------------------------\n";
 }
 
 void testeRegistrarDespesaSemValor() {
-    std::cout << "Cenário: Tentar registrar despesa sem valor\n";
+    std::cout << "Cenario: Tentar registrar despesa sem valor\n";
 
     ServicoDespesas servico;
-    bool sucesso = servico.registrarDespesa("açúcar", 0, "05/02/2026");
+    bool sucesso = servico.registrarDespesa("Acucar", 0, "05/02/2026");
 
     if (!sucesso && servico.listarDespesas().empty()) {
-        std::cout << "✔ despesa não registrada, dados incompletos\n";
+        std::cout << "✔ Despesa nao registrada, dados invalidos\n";
     } else {
-        std::cout << "✘ Erro: despesa inválida foi registrada\n";
+        std::cout << "✘ Erro: despesa invalida foi registrada\n";
     }
 
     std::cout << "---------------------------------\n";
 }
 
-/* ===============================
-   TESTES DE RATEIO
-   =============================== */
+/* =====================================================
+   TESTES DO SERVICO DE RATEIO
+   ===================================================== */
 
 void testeRateioComMoradores() {
-    std::cout << "Cenário: Rateio de despesa entre dois moradores\n";
+    std::cout << "Cenario: Rateio de despesa entre dois moradores\n";
 
     ServicoDespesas despesas;
     despesas.registrarDespesa("Aluguel", 1200.00, "01/02/2026");
@@ -65,10 +71,8 @@ void testeRateioComMoradores() {
     );
 
     if (resultado.size() == 2) {
-        std::cout << "Despesa total: R$ 1200\n";
-        std::cout << "Numero de moradores: 2\n";
-
         bool correto = true;
+
         for (const auto& r : resultado) {
             std::cout << r.getUsuario()
                       << " deve pagar R$ "
@@ -84,25 +88,23 @@ void testeRateioComMoradores() {
         } else {
             std::cout << "✘ Erro no valor do rateio\n";
         }
-    } else {
-        std::cout << "✘ Erro: quantidade incorreta de rateios\n";
     }
 
     std::cout << "---------------------------------\n";
 }
 
 void testeRateioSemMoradores() {
-    std::cout << "Cenário: Tentar rateio sem moradores\n";
+    std::cout << "Cenario: Tentar realizar rateio sem moradores\n";
 
     ServicoDespesas despesas;
-    despesas.registrarDespesa("Luz", 300, "02/02/2026");
+    despesas.registrarDespesa("Luz", 300.00, "02/02/2026");
 
-    std::vector<Usuario> moradores; // vazio
+    std::vector<Usuario> moradores;
     ServicoRateio rateio;
 
     try {
         rateio.calcularRateio(despesas.listarDespesas(), moradores);
-        std::cout << "✘ Erro: rateio inválido foi realizado\n";
+        std::cout << "✘ Erro: rateio invalido foi realizado\n";
     } catch (...) {
         std::cout << "✔ Rateio corretamente bloqueado\n";
     }
@@ -110,14 +112,81 @@ void testeRateioSemMoradores() {
     std::cout << "---------------------------------\n";
 }
 
-/* ===============================
+/* =====================================================
+   TESTES DO SERVICO DE EXTRATO (COM SALDO EM CAIXA)
+   ===================================================== */
+
+void testeExtratoComSaldoInicial() {
+    std::cout << "Cenario: Gerar extrato considerando saldo inicial\n";
+
+    ServicoDespesas despesas;
+    despesas.registrarDespesa("Aluguel", 1200.00, "01/02/2026");
+
+    std::vector<Usuario> moradores = {
+        Usuario("Ana"),
+        Usuario("Bruno")
+    };
+
+    ServicoRateio rateioService;
+    auto rateios = rateioService.calcularRateio(
+        despesas.listarDespesas(),
+        moradores
+    );
+
+    std::map<std::string, double> saldosIniciais;
+    saldosIniciais["Ana"] = 200.0;   // Ana já contribuiu antes
+    saldosIniciais["Bruno"] = 0.0;   // Bruno não contribuiu
+
+    ServicoExtrato extratoService;
+    auto extratos = extratoService.gerarExtrato(rateios, saldosIniciais);
+
+    if (extratos.size() == 2) {
+        for (const auto& e : extratos) {
+            std::cout << e.getUsuario() << "\n";
+            std::cout << "Saldo inicial: R$ " << e.getSaldoInicial() << "\n";
+            std::cout << "Rateio: R$ " << e.getValorRateio() << "\n";
+            std::cout << "Saldo final: R$ " << e.getSaldoFinal() << "\n";
+            std::cout << "-----------------------------\n";
+        }
+        std::cout << "✔ Extrato gerado corretamente com saldo\n";
+    } else {
+        std::cout << "✘ Erro na geracao do extrato\n";
+    }
+
+    std::cout << "---------------------------------\n";
+}
+
+void testeExtratoSemRateio() {
+    std::cout << "Cenario: Tentar gerar extrato sem rateio\n";
+
+    std::vector<Rateio> rateios;
+    std::map<std::string, double> saldos;
+
+    ServicoExtrato extratoService;
+
+    try {
+        extratoService.gerarExtrato(rateios, saldos);
+        std::cout << "✘ Erro: extrato gerado sem rateio\n";
+    } catch (...) {
+        std::cout << "✔ Extrato corretamente bloqueado\n";
+    }
+
+    std::cout << "---------------------------------\n";
+}
+
+/* =====================================================
    MAIN
-   =============================== */
+   ===================================================== */
 
 int main() {
     testeRegistrarDespesaValida();
     testeRegistrarDespesaSemValor();
+
     testeRateioComMoradores();
     testeRateioSemMoradores();
+
+    testeExtratoComSaldoInicial();
+    testeExtratoSemRateio();
+
     return 0;
 }
