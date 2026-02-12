@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <string>
-#include "Despesa.h"
+#include "../domain/Despesa.h"
 
 class ServicoDespesas {
 private:
