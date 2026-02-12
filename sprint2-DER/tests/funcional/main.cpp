@@ -1,20 +1,20 @@
-#include "funcional_despesas.h"
-#include "funcional_rateio.h"
-#include "funcional_extrato.h"
-#include <iostream>
-
+#include "funcional.h"
 
 int main() {
-    std::cout << "comecando teste\n";
+
     testeRegistrarDespesaValida();
     testeRegistrarDespesaSemValor();
+    std::cout << "Testes de despesas corretos!\n";
 
     testeRateioComMoradores();
     testeRateioSemMoradores();
+    std::cout << "Testes de rateio corretos!\n";
 
     testeExtratoComSaldoInicial();
     testeExtratoSemRateio();
-    std::cout << "finalizando teste\n";
+    std::cout << "Testes de extrato corretos!\n";
 
+    std::cout << "Todos os testes passaram corretamente!!\n";
+    
     return 0;
 }
