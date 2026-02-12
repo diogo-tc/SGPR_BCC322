@@ -1,5 +1,5 @@
-#ifndef UNIT_DESPESAS_H
-#define UNIT_DESPESAS_H
+#ifndef FUNCIONAL_DESPESAS_H
+#define FUNCIONAL_DESPESAS_H
 
 void testeRegistrarDespesaValida();
 void testeRegistrarDespesaSemValor();

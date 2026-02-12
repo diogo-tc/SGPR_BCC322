@@ -1,5 +1,5 @@
-#ifndef UNIT_EXTRATO_H
-#define UNIT_EXTRATO_H
+#ifndef FUNCIONAL_EXTRATO_H
+#define FUNCIONAL_EXTRATO_H
 
 void testeExtratoComSaldoInicial();
 void testeExtratoSemRateio();
