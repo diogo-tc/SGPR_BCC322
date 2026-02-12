@@ -7,6 +7,9 @@
 #include "../../services/ServicoDespesas.h"
 #include "../../services/ServicoRateio.h"
 #include "../../services/ServicoExtrato.h"
+#include "../repository/InMemoryDespesaRepository.h"
+#include "../../domain/EqualRateio.h"
+
 
 namespace infra {
 namespace factory {

@@ -1,8 +1,6 @@
 #include <cassert>
-#include "../../src/lib/services/ServicoDespesas.h"
-#include "../../src/lib/domain/Despesa.h"
-#include "../../src/lib/domain/Despesa.h"
-#include "../../src/lib/infra/factory/Factory.h"
+
+#include "funcional_despesas.h"
 
 void testeRegistrarDespesaValida() {
     auto servico = infra::factory::createServicoDespesas();

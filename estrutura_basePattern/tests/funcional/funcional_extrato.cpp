@@ -2,12 +2,7 @@
 #include <vector>
 #include <map>
 
-#include "../../src/lib/services/ServicoDespesas.h"
-#include "../../src/lib/services/ServicoRateio.h"
-#include "../../src/lib/services/ServicoExtrato.h"
-#include "../../src/lib/domain/Usuario.h"
-#include "../../src/lib/domain/Rateio.h"
-#include "../../src/lib/infra/factory/Factory.h"
+#include "funcional_extrato.h"
 
 void testeExtratoComSaldoInicial() {
     auto despesas = infra::factory::createServicoDespesas();

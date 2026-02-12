@@ -1,11 +1,7 @@
 #include <cassert>
 #include <vector>
 
-#include "../../src/lib/services/ServicoDespesas.h"
-#include "../../src/lib/services/ServicoRateio.h"
-#include "../../src/lib/domain/Usuario.h"
-#include "../../src/lib/infra/factory/Factory.h"
-
+#include "funcional_rateio.h"
 
 void testeRateioComMoradores() {
     auto despesas = infra::factory::createServicoDespesas();

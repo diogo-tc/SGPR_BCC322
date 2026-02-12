@@ -1,6 +1,4 @@
 #include "Factory.h"
-#include "../repository/InMemoryDespesaRepository.h"
-#include "../../domain/EqualRateio.h"
 
 namespace infra {
 namespace factory {
