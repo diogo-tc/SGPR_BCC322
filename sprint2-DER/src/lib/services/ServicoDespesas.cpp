@@ -2,8 +2,8 @@
 #include "../infra/factory/Factory.h"
 
 ServicoDespesas::ServicoDespesas()
-    : repo(infra::factory::createInMemoryDespesaRepository()) {}
-
+    : repo(infra::factory::createSQLiteDespesaRepository()) {}
+    
 ServicoDespesas::ServicoDespesas(std::unique_ptr<IDespesaRepository> repository)
     : repo(std::move(repository)) {}
 

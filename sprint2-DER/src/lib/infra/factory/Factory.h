@@ -14,7 +14,7 @@
 namespace infra {
 namespace factory {
 
-std::unique_ptr<IDespesaRepository> createInMemoryDespesaRepository();
+std::unique_ptr<IDespesaRepository> createSQLiteDespesaRepository();
 std::shared_ptr<IRateio> createEqualRateio();
 
 ServicoDespesas createServicoDespesas();

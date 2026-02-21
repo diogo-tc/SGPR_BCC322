@@ -1,9 +1,20 @@
 #include "funcional.h"
+#include <cassert>
 
-//testes de rateio
+// =================================================
+// TESTES DE RATEIO
+// =================================================
+
 void testeRateioComMoradores() {
-    auto despesas = infra::factory::createServicoDespesas();
-    despesas.registrarDespesa("Aluguel", 1200.00, "01/02/2026");
+
+    auto despesasService = infra::factory::createServicoDespesas();
+
+    size_t tamanhoAntes = despesasService.listarDespesas().size();
+
+    despesasService.registrarDespesa("Aluguel", 1200.00, "01/02/2026");
+
+    auto listaAtual = despesasService.listarDespesas();
+    assert(listaAtual.size() == tamanhoAntes + 1);
 
     vector<Usuario> moradores = {
         Usuario("Ana"),
@@ -11,19 +22,24 @@ void testeRateioComMoradores() {
     };
 
     auto rateio = infra::factory::createServicoRateio();
-    auto resultado = rateio.calcularRateio(
-        despesas.listarDespesas(),
-        moradores
-    );
+    auto resultado = rateio.calcularRateio(listaAtual, moradores);
 
     assert(resultado.size() == 2);
 
+    // calcula valor esperado dinamicamente
+    double soma = 0.0;
+    for (const auto& d : listaAtual) {
+        soma += d.getValor();
+    }
+
+    double valorEsperado = soma / moradores.size();
+
     for (const auto& r : resultado) {
-        assert(r.getValor() == 600.0);
+        assert(r.getValor() == valorEsperado);
     }
 }
-
 void testeRateioSemMoradores() {
+
     auto despesas = infra::factory::createServicoDespesas();
     despesas.registrarDespesa("Luz", 300.00, "02/02/2026");
 
@@ -41,11 +57,20 @@ void testeRateioSemMoradores() {
     assert(excecao);
 }
 
-//testes de extrato
+// =================================================
+// TESTES DE EXTRATO
+// =================================================
 
 void testeExtratoComSaldoInicial() {
-    auto despesas = infra::factory::createServicoDespesas();
-    despesas.registrarDespesa("Aluguel", 1200.00, "01/02/2026");
+
+    auto despesasService = infra::factory::createServicoDespesas();
+
+    size_t tamanhoAntes = despesasService.listarDespesas().size();
+
+    despesasService.registrarDespesa("Aluguel", 1200.00, "01/02/2026");
+
+    auto listaAtual = despesasService.listarDespesas();
+    assert(listaAtual.size() == tamanhoAntes + 1);
 
     vector<Usuario> moradores = {
         Usuario("Ana"),
@@ -53,10 +78,15 @@ void testeExtratoComSaldoInicial() {
     };
 
     auto rateioService = infra::factory::createServicoRateio();
-    auto rateios = rateioService.calcularRateio(
-        despesas.listarDespesas(),
-        moradores
-    );
+    auto rateios = rateioService.calcularRateio(listaAtual, moradores);
+
+    // calcula soma total dinamicamente
+    double soma = 0.0;
+    for (const auto& d : listaAtual) {
+        soma += d.getValor();
+    }
+
+    double valorEsperado = soma / moradores.size();
 
     map<string, double> saldos;
     saldos["Ana"] = 200.0;
@@ -70,13 +100,14 @@ void testeExtratoComSaldoInicial() {
     for (const auto& e : extratos) {
         if (e.getUsuario() == "Ana") {
             assert(e.getSaldoInicial() == 200.0);
-            assert(e.getValorRateio() == 600.0);
-            assert(e.getSaldoFinal() == -400.0);
+            assert(e.getValorRateio() == valorEsperado);
+            assert(e.getSaldoFinal() == 200.0 - valorEsperado);
         }
     }
 }
 
 void testeExtratoSemRateio() {
+
     vector<Rateio> rateios;
     map<string, double> saldos;
 
@@ -93,27 +124,39 @@ void testeExtratoSemRateio() {
     assert(excecao);
 }
 
-//testes de despesas 
+// =================================================
+// TESTES DE DESPESAS
+// =================================================
 
 void testeRegistrarDespesaValida() {
+
     auto servico = infra::factory::createServicoDespesas();
+
+    size_t tamanhoAntes = servico.listarDespesas().size();
 
     bool sucesso = servico.registrarDespesa("Acucar", 5.00, "05/02/2026");
 
     assert(sucesso);
-    assert(servico.listarDespesas().size() == 1);
 
-    const Despesa& d = servico.listarDespesas()[0];
+    auto lista = servico.listarDespesas();
+    assert(lista.size() == tamanhoAntes + 1);
+
+    const Despesa& d = lista.back();
     assert(d.getDescricao() == "Acucar");
     assert(d.getValor() == 5.00);
     assert(d.getData() == "05/02/2026");
 }
 
 void testeRegistrarDespesaSemValor() {
+
     auto servico = infra::factory::createServicoDespesas();
+
+    size_t tamanhoAntes = servico.listarDespesas().size();
 
     bool sucesso = servico.registrarDespesa("Acucar", 0, "05/02/2026");
 
     assert(!sucesso);
-    assert(servico.listarDespesas().empty());
+
+    auto lista = servico.listarDespesas();
+    assert(lista.size() == tamanhoAntes);
 }

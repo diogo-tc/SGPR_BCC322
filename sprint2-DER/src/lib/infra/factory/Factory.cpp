@@ -1,10 +1,11 @@
 #include "Factory.h"
+#include "../persistence/SQLiteDespesaRepository.h"
 
 namespace infra {
 namespace factory {
 
-std::unique_ptr<IDespesaRepository> createInMemoryDespesaRepository() {
-    return std::make_unique<InMemoryDespesaRepository>();
+std::unique_ptr<IDespesaRepository> createSQLiteDespesaRepository() {
+    return std::make_unique<SQLiteDespesaRepository>();
 }
 
 std::shared_ptr<IRateio> createEqualRateio() {
@@ -12,7 +13,7 @@ std::shared_ptr<IRateio> createEqualRateio() {
 }
 
 ServicoDespesas createServicoDespesas() {
-    return ServicoDespesas(createInMemoryDespesaRepository());
+    return ServicoDespesas(createSQLiteDespesaRepository());
 }
 
 ServicoRateio createServicoRateio() {
