@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *central = new QWidget(this);
     setCentralWidget(central);
 
+    // ===== TITULO =====
     titulo = new QLabel("💰 Controle de Despesas");
     titulo->setStyleSheet("font-size: 22px; font-weight: bold;");
 
@@ -62,6 +64,9 @@ MainWindow::MainWindow(QWidget *parent)
     btnApagarTodas = new QPushButton("Apagar Todas as Despesas");
     btnApagarTodas->setStyleSheet("background-color: #d9534f; color: white; padding: 6px;");
 
+    btnExtratoMensal = new QPushButton("Gerar Extrato Mensal");
+    btnExtratoMensal->setStyleSheet("background-color: #0275d8; color: white; padding: 6px;");
+
     QHBoxLayout *divisaoLayout = new QHBoxLayout();
     divisaoLayout->addWidget(labelTotal);
     divisaoLayout->addSpacing(20);
@@ -80,20 +85,15 @@ MainWindow::MainWindow(QWidget *parent)
     mainLayout->addLayout(formLayout);
     mainLayout->addWidget(tabelaDespesas);
     mainLayout->addLayout(divisaoLayout);
+    mainLayout->addWidget(btnExtratoMensal); // botão extrato
 
     central->setLayout(mainLayout);
 
     // ===== CONEXÕES =====
-    connect(btnRegistrar, &QPushButton::clicked,
-            this, &MainWindow::registrarDespesa);
-
-    connect(inputMoradores,
-            QOverload<int>::of(&QSpinBox::valueChanged),
-            this, &MainWindow::calcularDivisao);
-
-    connect(btnApagarTodas,
-            &QPushButton::clicked,
-            this, &MainWindow::apagarTodasDespesas);
+    connect(btnRegistrar, &QPushButton::clicked, this, &MainWindow::registrarDespesa);
+    connect(inputMoradores, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::calcularDivisao);
+    connect(btnApagarTodas, &QPushButton::clicked, this, &MainWindow::apagarTodasDespesas);
+    connect(btnExtratoMensal, &QPushButton::clicked, this, &MainWindow::gerarExtratoMensal);
 
     atualizarTabela();
 }
@@ -173,18 +173,92 @@ void MainWindow::atualizarTabela()
     for (int i = 0; i < static_cast<int>(lista.size()); ++i)
     {
         tabelaDespesas->setItem(i, 0,
-            new QTableWidgetItem(
-                QString::fromStdString(lista[i].getDescricao())));
+            new QTableWidgetItem(QString::fromStdString(lista[i].getDescricao())));
 
         tabelaDespesas->setItem(i, 1,
-            new QTableWidgetItem(
-                QString("R$ %1")
-                .arg(lista[i].getValor(), 0, 'f', 2)));
+            new QTableWidgetItem(QString("R$ %1")
+                                 .arg(lista[i].getValor(), 0, 'f', 2)));
 
         tabelaDespesas->setItem(i, 2,
-            new QTableWidgetItem(
-                QString::fromStdString(lista[i].getData())));
+            new QTableWidgetItem(QString::fromStdString(lista[i].getData())));
     }
 
     calcularDivisao();
+}
+
+// =============================
+// NOVO SLOT - EXTRATO MENSAL
+
+void MainWindow::gerarExtratoMensal()
+{
+    auto lista = servico.listarDespesas();
+    if (lista.empty()) {
+        QMessageBox::information(this, "Extrato Mensal", "Nenhuma despesa registrada.");
+        return;
+    }
+
+    // Identificar o último mês com registro
+    int ultimoMes = 0;
+    int ultimoAno = 0;
+    for (const auto &d : lista) {
+        QDate data = QDate::fromString(QString::fromStdString(d.getData()), "dd/MM/yyyy");
+        if (!data.isValid()) continue;
+        if (data.year() > ultimoAno || (data.year() == ultimoAno && data.month() > ultimoMes)) {
+            ultimoAno = data.year();
+            ultimoMes = data.month();
+        }
+    }
+
+    // Filtrar despesas do último mês
+    std::vector<Despesa> despesasMes;
+    double totalMes = 0.0;
+    for (const auto &d : lista) {
+        QDate data = QDate::fromString(QString::fromStdString(d.getData()), "dd/MM/yyyy");
+        if (data.isValid() && data.year() == ultimoAno && data.month() == ultimoMes) {
+            despesasMes.push_back(d);
+            totalMes += d.getValor();
+        }
+    }
+
+    int moradores = inputMoradores->value();
+    double valorPorMorador = (moradores > 0) ? totalMes / moradores : 0.0;
+
+    // Criar diálogo
+    QDialog *dialog = new QDialog(this);
+    dialog->setWindowTitle("Extrato Mensal");
+    dialog->resize(600, 400);
+
+    QVBoxLayout *layout = new QVBoxLayout(dialog);
+
+    QLabel *labelMes = new QLabel(QString("Mês: %1/%2")
+                                  .arg(ultimoMes, 2, 10, QChar('0'))
+                                  .arg(ultimoAno));
+    labelMes->setStyleSheet("font-weight: bold; font-size: 16px;");
+    layout->addWidget(labelMes);
+
+    QTableWidget *tabela = new QTableWidget();
+    tabela->setColumnCount(3);
+    tabela->setHorizontalHeaderLabels({"Descrição", "Valor", "Data"});
+    tabela->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    tabela->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    tabela->setRowCount(despesasMes.size());
+    for (int i = 0; i < static_cast<int>(despesasMes.size()); ++i) {
+        tabela->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(despesasMes[i].getDescricao())));
+        tabela->setItem(i, 1, new QTableWidgetItem(QString("R$ %1").arg(despesasMes[i].getValor(), 0, 'f', 2)));
+        tabela->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(despesasMes[i].getData())));
+    }
+
+    layout->addWidget(tabela);
+
+    QLabel *labelTotal = new QLabel(QString("Despesa total: R$ %1").arg(totalMes, 0, 'f', 2));
+    labelTotal->setStyleSheet("font-weight: bold; font-size: 14px;");
+    layout->addWidget(labelTotal);
+
+    QLabel *labelPorMorador = new QLabel(QString("Valor a ser pago por cada morador: R$ %1").arg(valorPorMorador, 0, 'f', 2));
+    labelPorMorador->setStyleSheet("font-weight: bold; font-size: 14px;");
+    layout->addWidget(labelPorMorador);
+
+    dialog->setLayout(layout);
+    dialog->exec();
 }
