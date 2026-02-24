@@ -87,4 +87,9 @@ const std::vector<Despesa>& SQLiteDespesaRepository::listar() const {
     }
 
     return cache;
+    }
+
+void SQLiteDespesaRepository::clear() {
+        QSqlQuery query;
+        query.exec("DELETE FROM despesas");
 }

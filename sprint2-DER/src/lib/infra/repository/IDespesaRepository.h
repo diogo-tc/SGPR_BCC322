@@ -10,6 +10,7 @@ public:
 
     virtual void adicionar(const Despesa& d) = 0;
     virtual const std::vector<Despesa>& listar() const = 0;
+    virtual void clear() = 0;   
 };
 
 #endif

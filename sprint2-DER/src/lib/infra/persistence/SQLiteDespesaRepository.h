@@ -13,6 +13,7 @@ public:
 
     void adicionar(const Despesa& d) override;
     const std::vector<Despesa>& listar() const override;
+    void clear() override;
 
 private:
     void inicializarBanco();

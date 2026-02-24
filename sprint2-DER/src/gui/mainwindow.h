@@ -2,21 +2,15 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-
-// Widgets
+#include <QLabel>
 #include <QLineEdit>
 #include <QDoubleSpinBox>
 #include <QDateEdit>
 #include <QPushButton>
 #include <QTableWidget>
-#include <QLabel>
+#include <QSpinBox>
 
-// Layouts
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-
-// Infraestrutura
-#include "../../src/lib/infra/factory/Factory.h"
+#include "../lib/services/ServicoDespesas.h"
 
 class MainWindow : public QMainWindow
 {
@@ -24,13 +18,20 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow() = default;
 
 private slots:
     void registrarDespesa();
+    void calcularDivisao();
+    void apagarTodasDespesas();
 
 private:
-    // ===== Componentes da Interface =====
+    void atualizarTabela();
+    double calcularTotalDespesas();
+
+    // ===== Serviço =====
+    ServicoDespesas servico;
+
+    // ===== Componentes =====
     QLabel *titulo;
 
     QLineEdit *inputDescricao;
@@ -40,8 +41,10 @@ private:
 
     QTableWidget *tabelaDespesas;
 
-    // ===== Métodos Internos =====
-    void atualizarTabela();
+    QLabel *labelTotal;
+    QSpinBox *inputMoradores;
+    QLabel *labelValorPorMorador;
+    QPushButton *btnApagarTodas;
 };
 
-#endif // MAINWINDOW_H
+#endif

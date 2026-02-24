@@ -3,7 +3,7 @@
 
 ServicoDespesas::ServicoDespesas()
     : repo(infra::factory::createSQLiteDespesaRepository()) {}
-    
+
 ServicoDespesas::ServicoDespesas(std::unique_ptr<IDespesaRepository> repository)
     : repo(std::move(repository)) {}
 
@@ -21,4 +21,10 @@ bool ServicoDespesas::registrarDespesa(const std::string& descricao,
 
 const std::vector<Despesa>& ServicoDespesas::listarDespesas() const {
     return repo->listar();
+}
+
+// ===== NOVO MÉTODO =====
+bool ServicoDespesas::apagarTodas() {
+    repo->clear();   // chama o clear() do repositório
+    return true;
 }

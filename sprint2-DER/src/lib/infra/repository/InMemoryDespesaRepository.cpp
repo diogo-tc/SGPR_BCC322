@@ -1,7 +1,7 @@
 #include "InMemoryDespesaRepository.h"
 
-void InMemoryDespesaRepository::adicionar(const Despesa& d) {
-    despesas.push_back(d);
+void InMemoryDespesaRepository::clear() {
+    despesas.clear();
 }
 
 const std::vector<Despesa>& InMemoryDespesaRepository::listar() const {

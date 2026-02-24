@@ -21,6 +21,8 @@ public:
                           const std::string& data) override;
 
     const std::vector<Despesa>& listarDespesas() const override;
+
+    bool apagarTodas();   // 👈 só DECLARAÇÃO, sem ServicoDespesas::
 };
 
 #endif
