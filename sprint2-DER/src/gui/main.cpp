@@ -2,7 +2,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QDebug>
-#include "loginwindow.h"
+#include "mainwindow.h"
 
 int main(int argc, char *argv[]) {
 
@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
                "nome TEXT NOT NULL,"
                "senha TEXT NOT NULL)");
 
-    LoginWindow w;
+    MainWindow w;
     w.show();
 
     return a.exec();
